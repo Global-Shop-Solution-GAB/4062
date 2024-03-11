@@ -1,0 +1,294 @@
+Program.Sub.ScreenSU.Start
+gui.Form1..create
+gui.Form1..caption("Payroll Export")
+gui.Form1..size(6390,2355)
+gui.Form1..minx(0)
+gui.Form1..miny(0)
+gui.Form1..position(0,0)
+gui.Form1..event(unload,form1_unload)
+gui.Form1..alwaysontop(False)
+gui.Form1..fontname("Arial")
+gui.Form1..fontsize(8)
+gui.Form1..forecolor(0)
+gui.Form1..fontstyle(,,,,)
+gui.Form1..BackColor(-2147483633)
+gui.Form1..controlbox(True)
+gui.Form1..maxbutton(True)
+gui.Form1..minbutton(True)
+gui.Form1..mousepointer(0)
+gui.Form1..moveable(True)
+gui.Form1..sizeable(False)
+gui.Form1..ShowInTaskBar(True)
+gui.Form1..titlebar(True)
+gui.Form1.txtFile.create(textbox,"",True,4815,270,0,200,600,True,0,Arial,8,-2147483643,1)
+gui.Form1.txtFile.defaultvalue("")
+gui.Form1.txtFile.controlgroup(0)
+gui.Form1.cmdBrowse.create(button)
+gui.Form1.cmdBrowse.caption("^")
+gui.Form1.cmdBrowse.visible(True)
+gui.Form1.cmdBrowse.size(855,375)
+gui.Form1.cmdBrowse.zorder(0)
+gui.Form1.cmdBrowse.position(5100,600)
+gui.Form1.cmdBrowse.enabled(True)
+gui.Form1.cmdBrowse.fontname("Arial")
+gui.Form1.cmdBrowse.fontsize(8)
+gui.Form1.cmdBrowse.event(click,cmdbrowse_click)
+gui.Form1.cmdBrowse.defaultvalue("")
+gui.Form1.cmdBrowse.controlgroup(0)
+gui.Form1.cmdExport.create(button)
+gui.Form1.cmdExport.caption("Export")
+gui.Form1.cmdExport.visible(True)
+gui.Form1.cmdExport.size(855,375)
+gui.Form1.cmdExport.zorder(0)
+gui.Form1.cmdExport.position(300,1100)
+gui.Form1.cmdExport.enabled(True)
+gui.Form1.cmdExport.fontname("Arial")
+gui.Form1.cmdExport.fontsize(8)
+gui.Form1.cmdExport.event(click,cmdexport_click)
+gui.Form1.cmdExport.defaultvalue("")
+gui.Form1.cmdExport.controlgroup(0)
+gui.Form1.lbl1.create(label,"Select Location:",True,1935,255,1,200,300,True,0,Arial,8,-2147483633,0)
+gui.Form1.lbl1.defaultvalue("")
+gui.Form1.lbl1.controlgroup(0)
+gui.Form1.txtFile.tabstop(True)
+gui.Form1.txtFile.tabindex(1)
+gui.Form1.cmdBrowse.tabstop(True)
+gui.Form1.cmdBrowse.tabindex(2)
+gui.Form1.cmdExport.tabstop(True)
+gui.Form1.cmdExport.tabindex(3)
+
+
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+
+Variable.Global.sFileName.Declare(String)
+Variable.UDT.uExport.Define("tnapaycode",String)
+Variable.UDT.uExport.Define("sfpaycode",String)
+Variable.UDT.uExport.Define("hrsforreminfo",String)
+Variable.UDT.uExport.Define("currkey",String)
+Variable.UDT.uExport.Define("extrapayind",String)
+Variable.UDT.uExport.Define("valbasisdiffpay",String)
+Variable.UDT.uExport.Define("psgrp",String)
+Variable.UDT.uExport.Define("pslvl",String)
+Variable.UDT.uExport.Define("position",String)
+Variable.UDT.uExport.Define("otcomptype",String)
+Variable.UDT.uExport.Define("premiumnum",String)
+Variable.UDT.uExport.Define("premiumind",String)
+Variable.UDT.uExport.Define("worktaxarea",String)
+Variable.UDT.uExport.Define("extdocnum",String)
+Variable.UDT.uExport.Define("compcode",String)
+Variable.UDT.uExport.Define("costcenter",String)
+Variable.UDT.uExport.Define("wrk/abs",String)
+Variable.UDT.uExport.Define("Employee",String,Employee)
+Variable.UDT.uExport.Define("startdate",String,BEG_CYMD)
+Variable.UDT.uExport.Define("wageType",String,TYPE)
+Variable.UDT.uExport.Define("timeunit",String,TimeUnit)
+Variable.UDT.uExport.Define("wagetypeamt",String)
+Variable.UDT.uExport.Define("EEID",String,EEID)
+Variable.UDT.uExport.Define("number",String,HOURS)
+Variable.UDT.uExport.Define("EC",String,EC)
+Variable.uGlobal.uExport.Declare("uExport")
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'Coded By SFF
+'12/19/2014
+'Payroll Export to .csv
+
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+F.ODBC.Connection!conX.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass,72000)
+Gui.Form1..Show
+
+V.Local.sDate.Declare(String)
+V.Local.sFileID.Declare(String)
+V.Local.sRet.Declare(String)
+
+F.Intrinsic.String.StripCharacters(V.Ambient.Time,V.Local.sFileID)
+
+F.Intrinsic.String.Format(V.Ambient.Date,"MMDDYYYY",V.Local.sDate)
+
+F.Intrinsic.String.Concat(V.Local.sDate,V.Local.sFileID,V.Local.sFileID)
+
+F.Intrinsic.String.Concat(V.Caller.FilesDir,"\PayrollExport\SPX_US_IN_TIME_",V.Local.sFileID,"_",V.Local.sDate,".csv",V.Local.sFileID)
+
+Gui.Form1.txtFile.Text(V.Local.sFileID)
+V.Global.sFileName.Set(V.Local.sFileID)
+
+	F.Intrinsic.Control.ExitSub
+
+	F.Intrinsic.Control.Label("Main_Err")
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4062_HVS_PYRL_EXPORT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Main.End
+
+program.sub.cmdbrowse_click.start
+F.Intrinsic.Control.SetErrorHandler("cmdbrowse_click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+V.Local.sDate.Declare(String)
+V.Local.sFileID.Declare(String)
+V.Local.sRet.Declare(String)
+
+F.Intrinsic.String.StripCharacters(V.Ambient.Time,V.Local.sFileID)
+
+F.Intrinsic.String.Format(V.Ambient.Date,"MMDDYYYY",V.Local.sDate)
+
+F.Intrinsic.String.Concat(V.Local.sDate,V.Local.sFileID,V.Local.sFileID)
+
+F.Intrinsic.String.Concat(V.Caller.FilesDir,"\SPX_US_IN_TIME_",V.Local.sFileID,"_",V.Local.sDate,V.Local.sFileID)
+
+Function.Intrinsic.UI.ShowSaveFileDialog(V.Local.sFileID,"Comma Separated File|.csv",V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet,<>,"***CANCEL***")
+	Gui.Form1.txtFile.Text(V.Local.sRet)
+	V.Global.sFileName.Set(V.Local.sRet)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdbrowse_click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4062_HVS_PYRL_EXPORT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.cmdbrowse_click.end
+
+program.sub.cmdexport_click.start
+F.Intrinsic.Control.SetErrorHandler("cmdexport_click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+Variable.local.export.declare(String)
+Variable.local.export.redim(0,6)
+Variable.local.hold.declare(String)
+Variable.local.query.declare(String)
+Variable.Local.I.declare(Long)
+Variable.local.DIR.declare(String)
+Variable.local.date.declare(String)
+Variable.local.file.declare(Long)
+Variable.local.filename.declare(String)
+Variable.local.sRet.declare(String)
+Variable.Local.time.Declare(String)
+Variable.Local.id.Declare(String)
+V.Local.hours.Declare(String)
+V.Local.hold2.Declare(String)
+
+Gui.Form1..Visible(false)
+
+V.uGlobal.uExport.Redim(-1,-1)
+
+Function.Intrinsic.String.Left(Variable.Passed.888888,8,Variable.Local.date)
+Function.Intrinsic.String.Mid(Variable.Passed.888888,9,6,Variable.Local.time)
+
+Function.Intrinsic.File.Gethandle(Variable.Local.File)
+
+Function.Intrinsic.File.Openforwrite(Variable.Global.sFilename,Variable.Local.File)
+
+'write header line to file
+Function.Intrinsic.File.Writeline(Variable.Local.File,"EEID,StartDate,T&APaycode,SFPayCode,WageType,HrsForRemInfo,Number,TimeUnit,WageTypeAmt,CurrKey,ExtraPayInd,ValBasisDiffPay,PSGrp,PSLvl,Position,OTCompType,PremiumNum,PremiumInd,WorkTaxArea,ExtDocNum,CompCode,CostCenter,WRK/ABS")
+Function.intrinsic.string.concat("SELECT a.COMMENTS_1 as EEID,'Hours' as TimeUnit,b.EC,b.EMPLOYEE,b.BEG_CYMD, b.TYPE, b.HOURS FROM v_employee_mstr a left join PYRL_LABOR_XFER b on a.employee = b.employee WHERE b.RUN_CYMD = '",V.Local.date,"' AND RUN_TIME = '",V.Local.time,"'",Variable.Local.query)
+Function.Odbc.Connection!Conx.Openrecordsetro("rstX",Variable.Local.query)
+	F.Intrinsic.Control.If(V.ODBC.conX!rstX.EOF,<>,True)
+		F.Intrinsic.Variable.LoadUDTFromRecordset("conX","rstX","v.uGlobal.uExport",False)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.UI.Msgbox("No Records to Export","No Records")
+		F.Intrinsic.Control.CallSub(Form1_unload)
+	F.Intrinsic.Control.EndIf
+
+	'format UDT fields for upload format
+	F.Intrinsic.Control.For(V.Local.I,V.uGlobal.uExport.LBound,V.uGlobal.uExport.UBound,1)
+		'Date
+		F.Intrinsic.String.Left(V.uGlobal.uExport(v.Local.I)!startdate,4,V.Local.date)
+		F.Intrinsic.String.Mid(V.uGlobal.uExport(v.Local.I)!startdate,5,4,V.Local.sRet)
+		F.Intrinsic.String.Concat(V.Local.sRet,V.Local.date,V.Local.date)
+		V.uGlobal.uExport(v.Local.I)!startdate.Set(V.Local.date)
+
+		'Wage Type
+		F.Intrinsic.Control.If(V.uGlobal.uExport(v.Local.I)!wageType,=,"RT")
+			V.uGlobal.uExport(v.Local.I)!wageType.Set("5000")
+		F.Intrinsic.Control.ElseIf(V.uGlobal.uExport(v.Local.I)!wageType,=,"OT")
+			V.uGlobal.uExport(v.Local.I)!wageType.Set("5103")
+		F.Intrinsic.Control.ElseIf(V.uGlobal.uExport(v.Local.I)!EC,=,"07")
+			V.uGlobal.uExport(v.Local.I)!wageType.Set("5203")
+		F.Intrinsic.Control.ElseIf(V.uGlobal.uExport(v.Local.I)!EC,=,"03")
+			V.uGlobal.uExport(v.Local.I)!wagetype.Set("5210")
+		F.Intrinsic.Control.ElseIf(V.uGlobal.uExport(v.Local.I)!EC,=,"04")
+			V.uGlobal.uExport(v.Local.I)!wagetype.Set("5201")
+		F.Intrinsic.Control.ElseIf(V.uGlobal.uExport(v.Local.I)!EC,=,"05")
+			V.uGlobal.uExport(v.Local.I)!wagetype.Set("5205")
+		F.Intrinsic.Control.ElseIf(V.uGlobal.uExport(v.Local.I)!EC,=,"06")
+			V.uGlobal.uExport(v.Local.I)!wagetype.Set("5202")
+		F.Intrinsic.Control.EndIf
+
+		'WRK/ABS if Reg or Overtime "W" else "A"
+		F.intrinsic.control.if(V.uglobal.uExport(v.local.i)!wageType,=,"5000")
+			V.uGlobal.uExport(v.local.i)!wrk/abs.set("W")
+		F.Intrinsic.Control.ElseIf(V.uglobal.uExport(v.local.i)!wageType,=,"5103")
+			V.uGlobal.uExport(v.local.i)!wrk/abs.set("W")
+		F.Intrinsic.Control.Else
+			V.uGlobal.uExport(v.local.i)!wrk/abs.set("A")
+		F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.Next(V.Local.I)
+
+	F.Intrinsic.Variable.UDTMultiFlag(V.uGlobal.uExport!EC,"08")
+	F.Intrinsic.Variable.UDTMultiFlag(V.uGlobal.uExport!EC,"09")
+	F.Intrinsic.Variable.UDTMultiFlag(V.uGlobal.uExport!EC,"10")
+	F.Intrinsic.Variable.UDTDeleteFlagged(V.uGlobal.uExport)
+
+	'loop through UDT and write lines.
+	F.Intrinsic.Control.For(V.local.i,V.uGlobal.uExport.LBound,V.uGlobal.uExport.UBound,1)
+	
+	F.Intrinsic.String.Build("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},",V.uGlobal.uExport(v.Local.I)!EEID,V.uGlobal.uExport(v.Local.I)!startdate,V.uGlobal.uExport(v.local.i)!tnapaycode,V.uGlobal.uExport(v.local.I)!sfpaycode,V.uGlobal.uExport(v.Local.I)!wageType,V.uGlobal.uExport(v.Local.I)!hrsforreminfo,V.uGlobal.uExport(v.Local.I)!number,V.uGlobal.uExport(v.Local.i)!timeunit,V.uGlobal.uExport(v.Local.I)!wagetypeamt,V.uGlobal.uExport(v.Local.I)!currkey,V.uGlobal.uExport(v.Local.I)!extrapayind,V.uGlobal.uExport(v.Local.I)!valbasisdiffpay,V.uGlobal.uExport(v.Local.I)!psgrp,V.uGlobal.uExport(v.Local.i)!pslvl,V.uGlobal.uExport(v.Local.I)!position,V.uGlobal.uExport(v.Local.I)!otcomptype,V.uGlobal.uExport(v.Local.i)!premiumnum,V.uGlobal.uExport(v.Local.I)!premiumind,V.uGlobal.uExport(v.Local.I)!worktaxarea,V.uGlobal.uExport(v.Local.I)!extdocnum,V.Local.hold)
+	F.Intrinsic.String.Build("{0},{1},{2}",V.uGlobal.uExport(v.Local.I)!compcode,V.uGlobal.uExport(v.Local.I)!costcenter,V.uGlobal.uExport(v.Local.I)!wrk/abs,V.Local.hold2)
+	F.Intrinsic.String.Build("{0}{1}",V.Local.hold,V.Local.hold2,V.Local.hold)
+	Function.Intrinsic.File.Writeline(Variable.Local.File,V.Local.hold)
+
+	F.Intrinsic.Control.Next(V.Local.I)
+
+
+
+
+
+
+Function.Odbc.Conx!Rstx.Close
+
+Function.Intrinsic.File.Closefile(Variable.Local.File)
+
+Function.Intrinsic.Control.End
+
+
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdexport_click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4062_HVS_PYRL_EXPORT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.cmdexport_click.end
+
+program.sub.form1_unload.start
+F.Intrinsic.Control.End
+
+program.sub.form1_unload.end
+
+Program.Sub.Comments.Start
+${$0$}$Test Script$}$SFF$}$7/30/2014 10:28:13 AM
+Program.Sub.Comments.End
+
